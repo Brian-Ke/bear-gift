@@ -27,7 +27,6 @@
       padding: 20px 10px;
     }
 
-    /* 背景飄浮裝飾 */
     .bg-deco {
       position: absolute;
       color: rgba(255, 138, 174, 0.35);
@@ -40,7 +39,6 @@
       50% { transform: translateY(-18px) rotate(6deg); }
     }
 
-    /* 頁面外層排版容器（置中） */
     .app-layout {
       display: flex;
       justify-content: center;
@@ -52,7 +50,6 @@
       position: relative;
     }
 
-    /* 主卡片容器 */
     .card-container {
       background: #ffb6c1;
       border: 6px solid #ffffff;
@@ -70,7 +67,6 @@
       margin: 0 auto;
     }
 
-    /* 貼圖展示框 */
     .avatar-box {
       width: 145px;
       height: 145px;
@@ -115,7 +111,6 @@
       line-height: 1.6;
     }
 
-    /* 按鈕樣式 */
     .btn {
       font-family: inherit;
       border: 3px solid #ffffff;
@@ -165,7 +160,6 @@
       font-weight: bold;
     }
 
-    /* ================= 第四關：背包專屬清單 ================= */
     .bag-list {
       display: flex;
       flex-direction: column;
@@ -259,7 +253,6 @@
       margin-top: 4px;
     }
 
-    /* ================= 側邊規格面板 ================= */
     .bag-spec-panel {
       display: none;
       background: #ffffff;
@@ -324,7 +317,6 @@
       margin-bottom: 2px;
     }
 
-    /* 關卡切換動畫 */
     .step {
       display: none;
     }
@@ -337,7 +329,6 @@
       to { opacity: 1; transform: scale(1); }
     }
 
-    /* 螢幕震動動畫 */
     .screen-shake {
       animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
     }
@@ -348,7 +339,6 @@
       40%, 60% { transform: translate3d(5px, 0, 0); }
     }
 
-    /* 撕破紙張洞口 */
     .paper-rip-hole {
       position: absolute;
       top: 50%;
@@ -601,7 +591,7 @@
         <button class="btn btn-yes" onclick="goToStep('step-4')">去山洞挑禮物 ➔</button>
       </div>
 
-      <!-- ================= 關卡 4 (盲選模式) ================= -->
+      <!-- ================= 關卡 4 ================= -->
       <div id="step-4" class="step">
         <div class="avatar-box">
           <svg viewBox="0 0 100 100">
@@ -626,7 +616,7 @@
         
         <div class="bag-list">
           
-          <!-- 款式 A (帶私心推薦) -->
+          <!-- 款式 A -->
           <div class="bag-item-card" 
                onmouseenter="showBagSpec(1, this)" 
                onclick="selectBag(this, 1, '🎒 神秘款式 A (熊熊私心推薦)')">
@@ -661,13 +651,13 @@
             </div>
           </div>
 
-          <!-- 款式 C (直接讀取 bag3.jpg，無報錯) -->
+          <!-- 款式 C -->
           <div class="bag-item-card" 
                onmouseenter="showBagSpec(3, this)" 
                onclick="selectBag(this, 3, '🎒 神秘款式 C')">
             <div class="bag-thumb-box">
               <img id="thumb3" src="bag3.jpg" alt="款式 C" 
-                   onerror="if(!this.dataset.t){this.dataset.t=1;this.src='bag3.png';}else if(this.dataset.t==1){this.dataset.t=2;this.src='bag3.jpeg';}">
+                   onerror="if(!this.dataset.t){this.dataset.t=1;this.src='bag3.png';}">
             </div>
             <div class="bag-info-meta">
               <div class="bag-title">3. 🎒 神秘款式 C</div>
@@ -683,7 +673,7 @@
         <button class="btn btn-yes" onclick="confirmGiftSelection()">鎖定這個背包 🔒</button>
       </div>
 
-      <!-- ================= 關卡 5 (不顯示私心推薦字樣) ================= -->
+      <!-- ================= 關卡 5 ================= -->
       <div id="step-5" class="step">
         <div class="avatar-box">
           <svg viewBox="0 0 100 100">
@@ -845,29 +835,32 @@
   </div>
 
   <script>
-    /* ========================================================
-       📝 Google 表單設定：請在此填入你的表單送出網址與題號代碼
-       ======================================================== */
-    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeacEgylVsYBFCcOj3apqKeNJa37zqdUjib0nBB1qjOVGinHw/formResponse
-";
-    const ENTRY_ID = "entry.180240251";
+    /* 📝 Google 表單設定（沒填也不會壞掉，遊戲正常玩） */
+    var GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/填入你的表單ID/formResponse";
+    var ENTRY_ID = "entry.填入題目數字代碼";
 
-    /* 切換關卡 */
+    /* 切換關卡防呆 */
     function goToStep(stepId) {
-      document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
-      const target = document.getElementById(stepId);
-      if (target) {
-        target.classList.add('active');
-      }
+      try {
+        document.querySelectorAll('.step').forEach(function(el) {
+          el.classList.remove('active');
+        });
+        var target = document.getElementById(stepId);
+        if (target) {
+          target.classList.add('active');
+        }
 
-      if (stepId !== 'step-4') {
-        document.getElementById('bagSpecPanel').style.display = 'none';
+        var panel = document.getElementById('bagSpecPanel');
+        if (panel && stepId !== 'step-4') {
+          panel.style.display = 'none';
+        }
+      } catch (err) {
+        console.error("切換關卡出錯：", err);
       }
     }
 
-    /* 第二關逃跑放大機制 */
-    let step2Count = 0;
-    const step2BegMessages = [
+    var step2Count = 0;
+    var step2BegMessages = [
       "會沒有小禮物喔~ 🎁",
       "不要騙我嘛🥺",
       "誠實一點才可愛！",
@@ -876,27 +869,26 @@
     ];
 
     function handleStep2No() {
-      const yesBtn = document.getElementById('step2YesBtn');
-      const noBtn = document.getElementById('step2NoBtn');
-      const begText = document.getElementById('step2BegText');
+      var yesBtn = document.getElementById('step2YesBtn');
+      var noBtn = document.getElementById('step2NoBtn');
+      var begText = document.getElementById('step2BegText');
 
       step2Count++;
 
-      const scale = 1 + (step2Count * 0.28);
-      yesBtn.style.transform = `scale(${scale})`;
-      yesBtn.innerText = `YES! ` + "+".repeat(Math.min(step2Count, 4));
+      var scale = 1 + (step2Count * 0.28);
+      yesBtn.style.transform = "scale(" + scale + ")";
+      yesBtn.innerText = "YES! " + "+".repeat(Math.min(step2Count, 4));
 
-      const randomX = (Math.random() - 0.5) * 80;
-      const randomY = (Math.random() - 0.5) * 40;
-      const noScale = Math.max(0.55, 1 - (step2Count * 0.1));
-      noBtn.style.transform = `translate(${randomX}px, ${randomY}px) scale(${noScale})`;
+      var randomX = (Math.random() - 0.5) * 80;
+      var randomY = (Math.random() - 0.5) * 40;
+      var noScale = Math.max(0.55, 1 - (step2Count * 0.1));
+      noBtn.style.transform = "translate(" + randomX + "px, " + randomY + "px) scale(" + noScale + ")";
 
-      const msgIndex = (step2Count - 1) % step2BegMessages.length;
+      var msgIndex = (step2Count - 1) % step2BegMessages.length;
       begText.innerText = step2BegMessages[msgIndex];
     }
 
-    /* 第四關背包資料庫 */
-    const bagDatabase = {
+    var bagDatabase = {
       1: {
         title: "🎒 神秘款式 A (⭐ 熊熊私心推薦)",
         defaultImg: "bag1.jpg",
@@ -923,19 +915,18 @@
       }
     };
 
-    let selectedGift = "";
+    var selectedGift = "";
 
     function showBagSpec(id, cardElement) {
-      const data = bagDatabase[id];
+      var data = bagDatabase[id];
       if (!data) return;
 
       document.getElementById('panelBagTitle').innerText = data.title;
-      
-      const panelImg = document.getElementById('panelBagImg');
-      const targetCard = cardElement || document.querySelectorAll('.bag-item-card')[id - 1];
+      var panelImg = document.getElementById('panelBagImg');
+      var targetCard = cardElement || document.querySelectorAll('.bag-item-card')[id - 1];
       
       if (targetCard) {
-        const thumbImg = targetCard.querySelector('img');
+        var thumbImg = targetCard.querySelector('img');
         if (thumbImg && thumbImg.currentSrc) {
           panelImg.src = thumbImg.currentSrc;
         } else if (thumbImg && thumbImg.src) {
@@ -956,7 +947,9 @@
     }
 
     function selectBag(el, id, bagName) {
-      document.querySelectorAll('.bag-item-card').forEach(card => card.classList.remove('selected'));
+      document.querySelectorAll('.bag-item-card').forEach(function(card) {
+        card.classList.remove('selected');
+      });
       el.classList.add('selected');
       selectedGift = bagName;
       showBagSpec(id, el);
@@ -968,44 +961,39 @@
         return;
       }
       
-      // 第 5 關卡片去除推薦字樣，只顯示神秘款式
-      const cleanDisplayName = selectedGift.replace(/\s*\(.*私心推薦.*\)/g, '');
+      var cleanDisplayName = selectedGift.replace(/\s*\(.*私心推薦.*\)/g, '');
       document.getElementById('displayGiftName').innerText = cleanDisplayName;
       
-      // 自動背景提交到 Google 表單
       recordToGoogleForm(cleanDisplayName);
-      
       goToStep('step-5');
     }
 
-    /* ========================================================
-       Google 表單背景非同步紀錄函式 (免驗證、不跳頁、可重複記錄)
-       ======================================================== */
     function recordToGoogleForm(choiceText) {
-      if (!GOOGLE_FORM_URL || GOOGLE_FORM_URL.includes("填入你的表單ID")) {
-        console.warn("⚠️ 尚未設定 Google 表單網址，請先替換 GOOGLE_FORM_URL 與 ENTRY_ID");
+      if (!GOOGLE_FORM_URL || GOOGLE_FORM_URL.indexOf("填入你的表單ID") !== -1) {
+        console.warn("⚠️ Google 表單尚未填入網址，跳過發送。");
         return;
       }
 
-      const formData = new FormData();
-      formData.append(ENTRY_ID, choiceText);
+      try {
+        var formData = new FormData();
+        formData.append(ENTRY_ID, choiceText);
 
-      fetch(GOOGLE_FORM_URL, {
-        method: "POST",
-        mode: "no-cors",
-        body: formData
-      })
-      .then(() => {
-        console.log("✅ 成功記錄至 Google 表單：", choiceText);
-      })
-      .catch(err => {
-        console.error("❌ 紀錄失敗：", err);
-      });
+        fetch(GOOGLE_FORM_URL, {
+          method: "POST",
+          mode: "no-cors",
+          body: formData
+        }).then(function() {
+          console.log("✅ 成功記錄至 Google 表單：", choiceText);
+        }).catch(function(err) {
+          console.error("❌ 紀錄出錯：", err);
+        });
+      } catch (e) {
+        console.warn(e);
+      }
     }
 
-    /* 第六關：5次逃跑後撕破畫面彩蛋 */
-    let step6Count = 0;
-    const humbleBegMessages = [
+    var step6Count = 0;
+    var humbleBegMessages = [
       "真的不原諒嗎⋯求求約約了🥺",
       "不要不理熊熊啦，熊熊要哭哭了😭",
       "熊熊眼淚真的要掉下來了⋯💧",
@@ -1013,21 +1001,23 @@
     ];
 
     function handleStep6No() {
-      const noBtn = document.getElementById('step6NoBtn');
-      const begText = document.getElementById('step6BegText');
-      const paperRipHole = document.getElementById('paperRipHole');
-      const mainCard = document.getElementById('mainCard');
+      var noBtn = document.getElementById('step6NoBtn');
+      var begText = document.getElementById('step6BegText');
+      var paperRipHole = document.getElementById('paperRipHole');
+      var mainCard = document.getElementById('mainCard');
 
       step6Count++;
 
       if (step6Count < 5) {
-        const randomX = (Math.random() - 0.5) * 70;
-        const randomY = (Math.random() - 0.5) * 35;
-        noBtn.style.transform = `translate(${randomX}px, ${randomY}px)`;
+        var randomX = (Math.random() - 0.5) * 70;
+        var randomY = (Math.random() - 0.5) * 35;
+        noBtn.style.transform = "translate(" + randomX + "px, " + randomY + "px)";
         begText.innerText = humbleBegMessages[step6Count - 1];
       } else {
         mainCard.classList.add('screen-shake');
-        setTimeout(() => mainCard.classList.remove('screen-shake'), 450);
+        setTimeout(function() {
+          mainCard.classList.remove('screen-shake');
+        }, 450);
 
         noBtn.style.pointerEvents = 'none';
         noBtn.style.opacity = '0';
@@ -1046,7 +1036,7 @@
           spread: 60,
           origin: { y: 0.6 }
         });
-        setTimeout(() => {
+        setTimeout(function() {
           confetti({
             particleCount: 120,
             spread: 100,
