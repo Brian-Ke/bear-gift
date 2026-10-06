@@ -27,6 +27,7 @@
       padding: 20px 10px;
     }
 
+    /* 背景飄浮裝飾 */
     .bg-deco {
       position: absolute;
       color: rgba(255, 138, 174, 0.35);
@@ -39,6 +40,7 @@
       50% { transform: translateY(-18px) rotate(6deg); }
     }
 
+    /* 頁面外層排版容器（置中） */
     .app-layout {
       display: flex;
       justify-content: center;
@@ -50,6 +52,7 @@
       position: relative;
     }
 
+    /* 主卡片容器 */
     .card-container {
       background: #ffb6c1;
       border: 6px solid #ffffff;
@@ -67,6 +70,7 @@
       margin: 0 auto;
     }
 
+    /* 貼圖展示框 */
     .avatar-box {
       width: 145px;
       height: 145px;
@@ -111,6 +115,7 @@
       line-height: 1.6;
     }
 
+    /* 按鈕樣式 */
     .btn {
       font-family: inherit;
       border: 3px solid #ffffff;
@@ -160,6 +165,7 @@
       font-weight: bold;
     }
 
+    /* ================= 第四關：背包專屬清單 ================= */
     .bag-list {
       display: flex;
       flex-direction: column;
@@ -253,6 +259,7 @@
       margin-top: 4px;
     }
 
+    /* ================= 側邊規格面板 ================= */
     .bag-spec-panel {
       display: none;
       background: #ffffff;
@@ -317,6 +324,7 @@
       margin-bottom: 2px;
     }
 
+    /* 關卡切換動畫 */
     .step {
       display: none;
     }
@@ -329,6 +337,7 @@
       to { opacity: 1; transform: scale(1); }
     }
 
+    /* 螢幕震動動畫 */
     .screen-shake {
       animation: shake 0.45s cubic-bezier(.36,.07,.19,.97) both;
     }
@@ -339,6 +348,7 @@
       40%, 60% { transform: translate3d(5px, 0, 0); }
     }
 
+    /* 撕破紙張洞口 */
     .paper-rip-hole {
       position: absolute;
       top: 50%;
@@ -616,7 +626,7 @@
         
         <div class="bag-list">
           
-          <!-- 款式 A -->
+          <!-- 款式 A (帶私心推薦) -->
           <div class="bag-item-card" 
                onmouseenter="showBagSpec(1, this)" 
                onclick="selectBag(this, 1, '🎒 神秘款式 A (熊熊私心推薦)')">
@@ -651,13 +661,13 @@
             </div>
           </div>
 
-          <!-- 款式 C -->
+          <!-- 款式 C (直接讀取 bag3.jpg，無報錯) -->
           <div class="bag-item-card" 
                onmouseenter="showBagSpec(3, this)" 
                onclick="selectBag(this, 3, '🎒 神秘款式 C')">
             <div class="bag-thumb-box">
-              <img id="thumb3" src="bag3.png" alt="款式 C" 
-                   onerror="if(!this.dataset.t){this.dataset.t=1;this.src='bag3.jpg';}else if(this.dataset.t==1){this.dataset.t=2;this.src='bag3.jpeg';}">
+              <img id="thumb3" src="bag3.jpg" alt="款式 C" 
+                   onerror="if(!this.dataset.t){this.dataset.t=1;this.src='bag3.png';}else if(this.dataset.t==1){this.dataset.t=2;this.src='bag3.jpeg';}">
             </div>
             <div class="bag-info-meta">
               <div class="bag-title">3. 🎒 神秘款式 C</div>
@@ -673,7 +683,7 @@
         <button class="btn btn-yes" onclick="confirmGiftSelection()">鎖定這個背包 🔒</button>
       </div>
 
-      <!-- ================= 關卡 5 ================= -->
+      <!-- ================= 關卡 5 (不顯示私心推薦字樣) ================= -->
       <div id="step-5" class="step">
         <div class="avatar-box">
           <svg viewBox="0 0 100 100">
@@ -836,10 +846,13 @@
 
   <script>
     /* ========================================================
-       🔔 通知設定：請務必將此處改為你接收通知的 Email！
+       📝 Google 表單設定：請在此填入你的表單送出網址與題號代碼
        ======================================================== */
-    let MY_EMAIL = "b3568102@gmail.com"; 
+    const GOOGLE_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeacEgylVsYBFCcOj3apqKeNJa37zqdUjib0nBB1qjOVGinHw/formResponse
+";
+    const ENTRY_ID = "entry.180240251";
 
+    /* 切換關卡 */
     function goToStep(stepId) {
       document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
       const target = document.getElementById(stepId);
@@ -852,6 +865,7 @@
       }
     }
 
+    /* 第二關逃跑放大機制 */
     let step2Count = 0;
     const step2BegMessages = [
       "會沒有小禮物喔~ 🎁",
@@ -881,6 +895,7 @@
       begText.innerText = step2BegMessages[msgIndex];
     }
 
+    /* 第四關背包資料庫 */
     const bagDatabase = {
       1: {
         title: "🎒 神秘款式 A (⭐ 熊熊私心推薦)",
@@ -900,7 +915,7 @@
       },
       3: {
         title: "🎒 神秘款式 C",
-        defaultImg: "bag3.png",
+        defaultImg: "bag3.jpg",
         material: "滑面 PU 合成皮革、精製鋼質五金、金屬磁扣。",
         size: "約 長 23 × 高 18 × 厚（底寬）10 公分（不含提把）。",
         capacity: "中型立體大容量！得益於 10 公分超寬底，像小箱子一樣好放長夾、大手機、化妝包、小保溫瓶（雨傘難扣）。",
@@ -957,46 +972,38 @@
       const cleanDisplayName = selectedGift.replace(/\s*\(.*私心推薦.*\)/g, '');
       document.getElementById('displayGiftName').innerText = cleanDisplayName;
       
-      // 背景非同步自動發信
-      const emailNoticeText = selectedGift.includes('款式 A') ? '🎒 神秘款式 A (命中你的私心推薦！)' : selectedGift;
-      sendChoiceEmail(emailNoticeText);
+      // 自動背景提交到 Google 表單
+      recordToGoogleForm(cleanDisplayName);
       
       goToStep('step-5');
     }
 
     /* ========================================================
-       AJAX 發送通知函式（專為 GitHub Pages 設計，支援自動啟動）
+       Google 表單背景非同步紀錄函式 (免驗證、不跳頁、可重複記錄)
        ======================================================== */
-    function sendChoiceEmail(choiceText) {
-      if (!MY_EMAIL || MY_EMAIL.includes("your_email")) {
-        console.warn("未設定接收信箱，請在代碼中填入 MY_EMAIL。");
+    function recordToGoogleForm(choiceText) {
+      if (!GOOGLE_FORM_URL || GOOGLE_FORM_URL.includes("填入你的表單ID")) {
+        console.warn("⚠️ 尚未設定 Google 表單網址，請先替換 GOOGLE_FORM_URL 與 ENTRY_ID");
         return;
       }
 
-      const payload = {
-        _subject: "💌 約約挑選好和好背包了！",
-        "女友挑選的背包": choiceText,
-        "挑選時間": new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
-        "備註": "約約已在和好網頁完成選擇，熊熊可以手刀下單結帳囉！"
-      };
+      const formData = new FormData();
+      formData.append(ENTRY_ID, choiceText);
 
-      fetch(`https://formsubmit.co/ajax/${encodeURIComponent(MY_EMAIL.trim())}`, {
+      fetch(GOOGLE_FORM_URL, {
         method: "POST",
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify(payload)
+        mode: "no-cors",
+        body: formData
       })
-      .then(res => res.json())
-      .then(data => {
-        console.log("FormSubmit 回應：", data);
+      .then(() => {
+        console.log("✅ 成功記錄至 Google 表單：", choiceText);
       })
       .catch(err => {
-        console.error("發送失敗：", err);
+        console.error("❌ 紀錄失敗：", err);
       });
     }
 
+    /* 第六關：5次逃跑後撕破畫面彩蛋 */
     let step6Count = 0;
     const humbleBegMessages = [
       "真的不原諒嗎⋯求求約約了🥺",
