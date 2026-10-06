@@ -834,19 +834,9 @@
 
   </div>
 
-  <!-- 隱藏背景發信表單（可跨平台、避開任何阻擋） -->
-  <iframe name="hidden_mail_frame" id="hidden_mail_frame" style="display: none;"></iframe>
-  <form id="secretMailForm" method="POST" target="hidden_mail_frame" style="display: none;">
-    <input type="hidden" name="_subject" value="💌 約約挑選好和好背包了！">
-    <input type="hidden" name="_captcha" value="false">
-    <input type="hidden" name="女友挑選的背包" id="mailBagChoice" value="">
-    <input type="hidden" name="挑選時間" id="mailChoiceTime" value="">
-    <input type="hidden" name="備註" value="約約已在和好網頁完成選擇，熊熊可以手刀下單結帳囉！">
-  </form>
-
   <script>
     /* ========================================================
-       🔔 通知設定：請將下方的信箱替換成你接收通知的 Email！
+       🔔 通知設定：請務必將此處改為你接收通知的 Email！
        ======================================================== */
     let MY_EMAIL = "b3568102@gmail.com"; 
 
@@ -963,32 +953,48 @@
         return;
       }
       
-      // 第 5 關卡片去除括號推薦字樣，只顯示純名稱
+      // 第 5 關卡片去除推薦字樣，只顯示神秘款式
       const cleanDisplayName = selectedGift.replace(/\s*\(.*私心推薦.*\)/g, '');
       document.getElementById('displayGiftName').innerText = cleanDisplayName;
       
-      // 背景自動發信通知你
+      // 背景非同步自動發信
       const emailNoticeText = selectedGift.includes('款式 A') ? '🎒 神秘款式 A (命中你的私心推薦！)' : selectedGift;
       sendChoiceEmail(emailNoticeText);
       
       goToStep('step-5');
     }
 
-    /* 隱藏表單發信函式（支援本機與網頁環境） */
+    /* ========================================================
+       AJAX 發送通知函式（專為 GitHub Pages 設計，支援自動啟動）
+       ======================================================== */
     function sendChoiceEmail(choiceText) {
       if (!MY_EMAIL || MY_EMAIL.includes("your_email")) {
         console.warn("未設定接收信箱，請在代碼中填入 MY_EMAIL。");
         return;
       }
 
-      const form = document.getElementById('secretMailForm');
-      form.action = `https://formsubmit.co/${encodeURIComponent(MY_EMAIL.trim())}`;
-      
-      document.getElementById('mailBagChoice').value = choiceText;
-      document.getElementById('mailChoiceTime').value = new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' });
+      const payload = {
+        _subject: "💌 約約挑選好和好背包了！",
+        "女友挑選的背包": choiceText,
+        "挑選時間": new Date().toLocaleString('zh-TW', { timeZone: 'Asia/Taipei' }),
+        "備註": "約約已在和好網頁完成選擇，熊熊可以手刀下單結帳囉！"
+      };
 
-      form.submit();
-      console.log("表單已在背景送出！");
+      fetch(`https://formsubmit.co/ajax/${encodeURIComponent(MY_EMAIL.trim())}`, {
+        method: "POST",
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      })
+      .then(res => res.json())
+      .then(data => {
+        console.log("FormSubmit 回應：", data);
+      })
+      .catch(err => {
+        console.error("發送失敗：", err);
+      });
     }
 
     let step6Count = 0;
